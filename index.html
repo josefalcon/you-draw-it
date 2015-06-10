@@ -9,8 +9,13 @@
       border: 0;
     }
 
+    body {
+       font-family: Avenir,helvetica,arial,comic sans,sans-serif;
+    }
+
     svg {
       cursor: pointer;
+      display: block;
     }
 
     circle {
@@ -22,25 +27,61 @@
       stroke: #001f3f;
       stroke-width: 2;
     }
+
+    .olive-bg {
+      background-color: #3D9970;
+    }
+
+    .center {
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 2rem 0;
+    }
+
+    main {
+      padding: 2rem 0;
+      width: 100%;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #001f3f;
+    }
+
+    h2 {
+      font-weight: 100;
+    }
   </style>
 </head>
 <body>
+  <header class="olive-bg">
+    <svg class="center"></svg>
+  </header>
+  <main>
+    <h1>you draw it</h1>
+    <h2>simple line drawing with D3</h2>
+    <h2>click and drag to reshape the graph</h2>
+  </main>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
   <script type="text/javascript">
-    var width = 400;
-    var height = 400;
+    var width = 800;
+    var height = 300;
     var radius = 4;
+    var padding = radius * 6;
     var numCircles = 20;
 
-    var svg = d3.select('body')
-      .append('svg')
+    var svg = d3.select('svg')
+      // .append('svg')
       .attr('width', width)
       .attr('height', height);
 
     // maps point positions to pixel positions along the x axis
     var spread = d3.scale.ordinal()
       .domain(d3.range(numCircles))
-      .rangeBands([0, width]);
+      .rangeBands([0, width], 0, 1);
 
     // function for generating svg path
     var line = d3.svg.line()
@@ -52,7 +93,7 @@
     var points = d3.range(numCircles).map(function(d) {
       return {
         x: spread(d),
-        y: Math.floor(Math.random() * height)
+        y: Math.floor(Math.random() * (height - 2*padding) + padding)
       }
     });
 
@@ -82,8 +123,9 @@
     svg.call(drag);
 
     function dragHandler() {
-      var x = d3.event.x;
-      var y = d3.event.y;
+      var m = d3.mouse(this);
+      var x = m[0];
+      var y = Math.max(padding, Math.min(m[1], height - padding))
 
       var range = spread.range();
       var space = spread.rangeBand() / 2;
